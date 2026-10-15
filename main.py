@@ -4,17 +4,18 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 load_dotenv()
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN")
 PORT = int(os.environ.get("PORT", 10000))
+STATIC_PATH = os.getenv("STATIC_PATH")
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        FRONTEND_ORIGIN,
+        FRONTEND_ORIGIN or f"http://localhost:{PORT}",
         # "https://actionless.github.io",
         # "http://localhost:8000",
     ],
@@ -67,6 +68,14 @@ async def upload(file: UploadFile = File(...)):
     except Exception as e:
         print(e)
         return JSONResponse({"error": str(e)}, status_code=500)
+
+
+if STATIC_PATH is not None:
+    _STATIC_PATH: str = STATIC_PATH
+
+    @app.get("/")
+    async def index() -> FileResponse:
+        return FileResponse(_STATIC_PATH + "/index.html")
 
 
 def run() -> None:
