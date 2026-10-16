@@ -77,6 +77,11 @@ if STATIC_PATH is not None:
     async def index() -> FileResponse:
         return FileResponse(_STATIC_PATH + "/index.html")
 
+    @app.get("/favicon.png")
+    async def favicon() -> FileResponse:
+        print(_STATIC_PATH + "/upload_backend/favicon.png")
+        return FileResponse(_STATIC_PATH + "/upload_backend/favicon.png")
+
 
 def run() -> None:
     uvicorn.run(app, host="0.0.0.0", port=PORT)
